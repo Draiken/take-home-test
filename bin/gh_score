@@ -4,8 +4,4 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
 require 'github_score'
 
-handle = ARGV.first
-abort('Usage: gh_score USERNAME') if !handle || handle == ""
-
-score = GithubScore::UserPublicEventList.new(handle).score
-puts("Total score for user #{handle}\n#{score}")
+GithubScore::Cli.new(ARGV.dup).run
