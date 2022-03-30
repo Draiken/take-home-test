@@ -11,6 +11,14 @@ module GithubScore
         expect(score).to eq(7)
       end
 
+      context 'when the handle does not exist' do
+        it 'raises an error' do
+          allow(github_client).to receive(:public_events).and_raise(Client::NotFoundError)
+
+          expect { score }.to raise_error(described_class::InvalidHandleError)
+        end
+      end
+
       def events_from_types(event_types)
         event_types.map { |type| double(type: type) }
       end

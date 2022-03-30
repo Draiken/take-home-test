@@ -16,16 +16,22 @@ module GithubScore
 
     def to_a
       github_client.public_events(handle)
+    rescue Client::NotFoundError
+      raise(InvalidHandleError, "Handle #{handle} was not found")
     end
 
     private
 
     attr_reader :github_client
+
+    class InvalidHandleError < RuntimeError; end
   end
 
   class Client
     def public_events(handle)
-      events_client.performed(handle).to_a
+      events_client.performed(handle, public: true).to_a
+    rescue Github::Error::NotFound => e
+      raise(NotFoundError, e)
     end
 
     private
@@ -33,6 +39,8 @@ module GithubScore
     def events_client
       @events_client ||= Github::Client::Activity::Events.new(auto_pagination: true)
     end
+
+    class NotFoundError < RuntimeError; end
   end
 
   class EventScorer
