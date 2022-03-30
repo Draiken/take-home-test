@@ -3,6 +3,23 @@
 require 'bundler/setup'
 Bundler.require
 
-Github::Client::Activity::Events.new.public('Draiken') do |event|
-  puts event.type
+module GithubScore
+  class EventScorer
+    EVENT_SCORES = {
+      'IssueEvent' => 1,
+      'IssueCommentEvent' => 2,
+      'PushEvent' => 3,
+      'PullRequestReviewCommentEvent' => 4,
+      'WatchEvent' => 5,
+      'CreateEvent' => 6,
+    }.freeze
+
+    def self.score(events)
+      events.sum { |event| EVENT_SCORES.fetch(event.type, 1) }
+    end
+  end
 end
+
+events = Github::Client::Activity::Events.new.public('Draiken').to_a
+score = GithubScore::EventScorer.score(events)
+puts("Total score for #{events.size} events\n#{score}")
