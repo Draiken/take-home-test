@@ -9,6 +9,8 @@ module GithubScore
     def run
       parse_args
       puts("Total score for user #{handle}\n#{score}")
+    rescue GithubScore::UserPublicEventList::InvalidHandleError => e
+      abort(e.message)
     end
 
     private
